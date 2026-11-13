@@ -31,8 +31,8 @@ Los contenedores se encuentran por nombre de servicio; `localhost` dentro de uno
 Se necesitan Git, Docker Engine 28 o posterior y el plugin Docker Compose 2.17 o posterior. No se necesita Node.js en el anfitrión. Los puertos predeterminados deben estar disponibles.
 
 ```bash
-git clone <URL-DE-TU-REPOSITORIO>
-cd <DIRECTORIO-DEL-REPOSITORIO>
+git clone https://github.com/sadamlg/pern-template.git
+cd pern-template
 cp .env.example .env
 docker compose config --quiet
 docker compose up --build --detach --wait --wait-timeout 180
@@ -97,7 +97,7 @@ docker compose exec backend npm run prisma:migrate:status
 
 ## Ramas, CI y despliegue
 
-Se propone `develop` como integración y `main` como versión estable; los cambios se integran mediante PR. El workflow ejecuta pruebas y lint de ambos componentes, build de frontend y validación y generación Prisma. Las protecciones, checks obligatorios, rama predeterminada y eliminación automática de ramas deben configurarse en GitHub; el archivo de CI no los activa por sí solo.
+`develop` es la rama predeterminada de integración y `main` conserva la versión estable. Ambas están protegidas: requieren PR y los tres checks de CI, incluso para administradores; no permiten force-push ni eliminación. GitHub elimina automáticamente las ramas de origen fusionadas. El workflow ejecuta pruebas y lint de ambos componentes, build de frontend, validación y generación Prisma y una prueba de Compose. Los repositorios derivados deben configurar sus propias protecciones en GitHub; el archivo de CI no las activa por sí solo.
 
 Compose es un entorno de desarrollo, no una configuración de producción. Para desplegar un proyecto derivado hay que elegir proveedor y configurar servicios, secretos, red privada, TLS, persistencia, backups, migraciones, observabilidad y recuperación. No se incluyen credenciales ni recursos de producción.
 
