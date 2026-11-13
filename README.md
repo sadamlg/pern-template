@@ -1,6 +1,6 @@
 # Plantilla PERN
 
-Base reutilizable, independiente de cualquier negocio, para iniciar proyectos web con un entorno local reproducible. Combina la infraestructura de desarrollo de Señor del Mictlán con el stack y las guías de web-PERN-stack. La pantalla y la cola son ejemplos de infraestructura, no funcionalidades de negocio.
+Base reutilizable, independiente de cualquier negocio, para iniciar proyectos web con un entorno local reproducible. La pantalla y la cola son ejemplos de infraestructura, no funcionalidades de negocio.
 
 ## Stack y arquitectura
 
@@ -101,6 +101,5 @@ docker compose exec backend npm run prisma:migrate:status
 
 Compose es un entorno de desarrollo, no una configuración de producción. Para desplegar un proyecto derivado hay que elegir proveedor y configurar servicios, secretos, red privada, TLS, persistencia, backups, migraciones, observabilidad y recuperación. No se incluyen credenciales ni recursos de producción.
 
-## Fuentes
 
-La [guía original de web-PERN-stack](docs/reference/web-pern-guide.md) conserva su secuencia de construcción desde cero y detalles sobre versiones y decisiones. Es una referencia histórica: sus fragmentos de código y comandos pueden diferir de esta implementación; este README y los archivos ejecutables describen la plantilla actual. La infraestructura LAN, CI y la base de servicios se adaptaron de [Señor del Mictlán](https://github.com/sadamlg/sr_del_mictlan); su roadmap y reglas de producto no forman parte de esta plantilla.
+La [guía de Docker Compose](docs/docker/COMPOSE.md) detalla los servicios, las comprobaciones, el acceso LAN y el flujo de desarrollo.
