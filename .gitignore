@@ -1,0 +1,37 @@
+# Environment files and local credentials
+.env
+.env.*
+!.env.example
+.aws/
+.secrets/
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies and generated output
+node_modules/
+.next/
+dist/
+coverage/
+backend/generated/prisma/
+playwright-report/
+test-results/
+.turbo/
+.vercel/
+
+# Local databases, dumps, and logs
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.sql.gz
+*.log
+pgdata/
+postgres-data/
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+.idea/

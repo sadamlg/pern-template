@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  frontend-checks:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.21.0
+          package-manager-cache: false
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+      - name: Run tests
+        run: npm test
+        working-directory: frontend
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: frontend
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+  backend-checks:
+    name: Backend checks
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://test:test@127.0.0.1:5432/test
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.21.0
+          package-manager-cache: false
+      - name: Install dependencies
+        run: npm ci
+        working-directory: backend
+      - name: Run tests
+        run: npm test
+        working-directory: backend
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: backend
+      - name: Validate Prisma schema
+        run: npm run prisma:validate
+        working-directory: backend
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+        working-directory: backend
+
+  compose-smoke:
+    name: Compose smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Start services
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          docker compose up --build --detach --wait --wait-timeout 180
+      - name: Verify queue and mail
+        run: |
+          docker compose exec -T worker npm run queue:demo
+          docker compose exec -T worker npm run worker:mail-smoke
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop services
+        if: always()
+        run: docker compose down --volumes

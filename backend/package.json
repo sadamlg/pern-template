@@ -1,0 +1,38 @@
+{
+  "name": "pern-template-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "lint": "eslint .",
+    "test": "node --test src/*.test.js",
+    "worker:dev": "node --watch src/worker.js",
+    "worker:mail-smoke": "node src/send-test-email.js",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:migrate:status": "prisma migrate status",
+    "queue:demo": "node src/queue-demo.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "bullmq": "6.3.12",
+    "express": "5.3.0",
+    "ioredis": "6.0.0",
+    "nodemailer": "10.2.1",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "globals": "17.13.0",
+    "prisma": "7.10.1"
+  },
+  "overrides": {
+    "minimatch": "11.0.1"
+  }
+}
