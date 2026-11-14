@@ -52,6 +52,7 @@ services:
       NODE_ENV: development
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL:?Define DATABASE_URL in .env}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
       MEDIA_BASE_URL: ${MEDIA_BASE_URL:-}
     ports:
       - "${BACKEND_BIND_ADDRESS:-127.0.0.1}:${BACKEND_PORT:-4000}:3000"
@@ -110,6 +111,7 @@ services:
     environment:
       NEXT_TELEMETRY_DISABLED: "1"
       INTERNAL_API_URL: http://backend:3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
       NEXT_ALLOWED_DEV_ORIGIN: ${NEXT_ALLOWED_DEV_ORIGIN:-}
       MEDIA_BASE_URL: ${MEDIA_BASE_URL:-}
     ports:
