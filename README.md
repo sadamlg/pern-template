@@ -71,7 +71,7 @@ scripts/dev-lan.sh up 192.168.1.20
 scripts/dev-lan.sh off
 ```
 
-El script publica temporalmente frontend, API y la bandeja de Mailpit en las interfaces IPv4 y configura el origen de desarrollo de Next.js; abre la IP indicada en los puertos anteriores desde otro equipo. PostgreSQL permanece en localhost; Redis y SMTP no se publican. La bandeja puede contener datos sensibles: utiliza sólo datos de prueba y una red confiable. El firewall puede requerir configuración. El script restaura los enlaces definidos en `.env` al desactivar LAN.
+El script publica temporalmente frontend, API y la bandeja de Mailpit en las interfaces IPv4, configura el origen de desarrollo de Next.js y establece `MEDIA_BASE_URL` con la IP LAN y el puerto del frontend. Las apps derivadas que generen URL absolutas de medios deben usar esa variable para que el otro dispositivo llegue al anfitrión, no a su propio `localhost`. Abre la IP indicada en los puertos anteriores desde otro equipo. PostgreSQL permanece en localhost; Redis y SMTP no se publican. La bandeja puede contener datos sensibles: utiliza sólo datos de prueba y una red confiable. El firewall puede requerir configuración. El script restaura los enlaces definidos en `.env` al desactivar LAN.
 
 ## Trabajo diario
 
