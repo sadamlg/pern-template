@@ -160,6 +160,9 @@ MAILPIT_BIND_ADDRESS=127.0.0.1
 MAILPIT_PORT=8025
 
 NEXT_ALLOWED_DEV_ORIGIN=
+# Configuración para apps derivadas con llamadas del navegador al API.
+FRONTEND_ORIGIN=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:4000
 # Las apps con URL absolutas de medios pueden usar esta base; el modo LAN la configura.
 MEDIA_BASE_URL=
 
@@ -630,6 +633,7 @@ services:
       NODE_ENV: development
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL:?Define DATABASE_URL in .env}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
       MEDIA_BASE_URL: ${MEDIA_BASE_URL:-}
     ports:
       - "${BACKEND_BIND_ADDRESS:-127.0.0.1}:${BACKEND_PORT:-4000}:3000"
@@ -688,6 +692,7 @@ services:
     environment:
       NEXT_TELEMETRY_DISABLED: "1"
       INTERNAL_API_URL: http://backend:3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
       NEXT_ALLOWED_DEV_ORIGIN: ${NEXT_ALLOWED_DEV_ORIGIN:-}
       MEDIA_BASE_URL: ${MEDIA_BASE_URL:-}
     ports:
@@ -840,13 +845,13 @@ Para probar desde otro dispositivo, identifica la IPv4 actual del anfitrión y, 
 scripts/dev-lan.sh up 192.168.1.20
 ```
 
-Sustituye la dirección por la IPv4 del equipo. El script valida la dirección y los puertos, crea `.env.dev-lan` sin modificar `.env`, configura `NEXT_ALLOWED_DEV_ORIGIN` y `MEDIA_BASE_URL`, y recrea frontend, API, worker y Mailpit. `MEDIA_BASE_URL` usa la IP indicada y el puerto publicado del frontend. Publica frontend, API y la UI de Mailpit en **todas las interfaces IPv4** (`0.0.0.0`), no sólo en la dirección indicada. Con los puertos predeterminados abre desde el otro dispositivo:
+Sustituye la dirección por la IPv4 del equipo. El script valida la dirección y los puertos, crea `.env.dev-lan` sin modificar `.env`, configura `NEXT_ALLOWED_DEV_ORIGIN`, `FRONTEND_ORIGIN`, `NEXT_PUBLIC_API_URL` y `MEDIA_BASE_URL`, y recrea frontend, API, worker y Mailpit. El origen y la URL pública del API usan la IP y los puertos LAN correspondientes; así las apps derivadas pueden hacer llamadas del navegador al API por una dirección accesible y configurar CORS para el origen exacto. `MEDIA_BASE_URL` usa la IP indicada y el puerto publicado del frontend. Publica frontend, API y la UI de Mailpit en **todas las interfaces IPv4** (`0.0.0.0`), no sólo en la dirección indicada. Con los puertos predeterminados abre desde el otro dispositivo:
 
 - Frontend: `http://192.168.1.20:3000`
 - Salud de la API: `http://192.168.1.20:4000/health`
 - Mailpit: `http://192.168.1.20:8025`
 
-La bandeja de Mailpit no tiene autenticación; usa sólo datos de prueba y una red confiable. El firewall y las reglas de red pueden requerir acceso a esos puertos. PostgreSQL conserva su enlace de `.env` (localhost por defecto); Redis y SMTP siguen sin puertos publicados. El navegador no puede resolver `backend` y, si una aplicación derivada hace llamadas directamente desde el navegador, necesita definir su origen y CORS; `localhost` en el otro dispositivo apunta a ese dispositivo. Si la aplicación genera URL absolutas de medios, debe consumir `MEDIA_BASE_URL` en frontend y backend; el script la configura con una dirección accesible desde LAN. La plantilla no implementa almacenamiento ni rutas para entregar medios. [Opciones de Next.js para orígenes de desarrollo](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins).
+La bandeja de Mailpit no tiene autenticación; usa sólo datos de prueba y una red confiable. El firewall y las reglas de red pueden requerir acceso a esos puertos. PostgreSQL conserva su enlace de `.env` (localhost por defecto); Redis y SMTP siguen sin puertos publicados. La demo consulta el API desde el servidor Next.js con `INTERNAL_API_URL`. El navegador no puede resolver `backend`; las apps derivadas que llamen directamente desde el navegador pueden usar `NEXT_PUBLIC_API_URL` y deben habilitar CORS para el origen configurado en `FRONTEND_ORIGIN`. `localhost` en el otro dispositivo apunta a ese dispositivo. Si la aplicación genera URL absolutas de medios, debe consumir `MEDIA_BASE_URL` en frontend y backend; el script la configura con una dirección accesible desde LAN. La plantilla no implementa CORS, almacenamiento ni rutas para entregar medios. Comprueba la generación de variables LAN con `bash scripts/dev-lan.test.sh`. [Opciones de Next.js para orígenes de desarrollo](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins).
 
 Para restaurar los enlaces de `.env` y eliminar el archivo temporal:
 
@@ -1166,7 +1171,7 @@ Uso:
   scripts/dev-lan.sh off
 
 El modo LAN publica frontend, API y la bandeja web de Mailpit en la IPv4 indicada.
-También configura MEDIA_BASE_URL con la dirección del frontend para las apps que generan URL absolutas de medios.
+También configura FRONTEND_ORIGIN y NEXT_PUBLIC_API_URL con direcciones LAN para apps derivadas que llamen al API desde el navegador. MEDIA_BASE_URL usa la dirección del frontend para las apps que generan URL absolutas de medios.
 PostgreSQL queda enlazado a localhost y el SMTP de Mailpit sólo está en Compose.
 EOF
 }
@@ -1232,6 +1237,8 @@ up_lan() {
     printf 'FRONTEND_BIND_ADDRESS=0.0.0.0\n'
     printf 'BACKEND_BIND_ADDRESS=0.0.0.0\n'
     printf 'MAILPIT_BIND_ADDRESS=0.0.0.0\n'
+    printf 'FRONTEND_ORIGIN=http://%s:%s\n' "$lan_ip" "$frontend_port"
+    printf 'NEXT_PUBLIC_API_URL=http://%s:%s\n' "$lan_ip" "$backend_port"
     printf 'NEXT_ALLOWED_DEV_ORIGIN=%s\n' "$lan_ip"
     printf 'MEDIA_BASE_URL=http://%s:%s\n' "$lan_ip" "$frontend_port"
   } > "$temp_env"

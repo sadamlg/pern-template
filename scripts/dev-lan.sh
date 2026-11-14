@@ -14,7 +14,8 @@ Uso:
   scripts/dev-lan.sh off
 
 El modo LAN publica frontend, API y la bandeja web de Mailpit en la IPv4 indicada.
-También configura MEDIA_BASE_URL con la dirección del frontend para las apps que generan URL absolutas de medios.
+También configura las URL y el origen LAN para las apps derivadas que llaman al API desde el navegador.
+MEDIA_BASE_URL usa la dirección del frontend para las apps que generan URL absolutas de medios.
 PostgreSQL queda enlazado a localhost y el SMTP de Mailpit sólo está en Compose.
 EOF
 }
@@ -80,6 +81,8 @@ up_lan() {
     printf 'FRONTEND_BIND_ADDRESS=0.0.0.0\n'
     printf 'BACKEND_BIND_ADDRESS=0.0.0.0\n'
     printf 'MAILPIT_BIND_ADDRESS=0.0.0.0\n'
+    printf 'FRONTEND_ORIGIN=http://%s:%s\n' "$lan_ip" "$frontend_port"
+    printf 'NEXT_PUBLIC_API_URL=http://%s:%s\n' "$lan_ip" "$backend_port"
     printf 'NEXT_ALLOWED_DEV_ORIGIN=%s\n' "$lan_ip"
     printf 'MEDIA_BASE_URL=http://%s:%s\n' "$lan_ip" "$frontend_port"
   } > "$temp_env"
